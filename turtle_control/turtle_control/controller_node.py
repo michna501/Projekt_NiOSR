@@ -5,7 +5,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import cv2 as cv
 import numpy as np
-
+import math
 
 on=False #czy jest wcisnieta myszka
 center = (200,200) # tak o
@@ -57,7 +57,20 @@ class TurtleController(Node):
 				#jak klikamy to rysujemy kreche od srodka do klika i koleczko, ez
 				cv.line(img,center,click,(10,180,20),3)
 				cv.circle(img,click,10,(0,20,200),2)
-				print(click)
+				# wyznaczanie kata do obrotu zolwia
+				angle = math.atan2(click[0] - center[0], -click[1] + center[1])/np.pi
+				dist = math.dist(center, click)
+				# predkosc obrotu miesci sie w przedziale -5 <> 5
+				msg.angular.z = -angle * 5.0
+				msg.linear.x = dist / 200 * 5.0
+				#print(click)
+			else:
+				msg.linear.x = 0.0
+				msg.linear.y = 0.0
+				msg.angular.z = 0.0
+
+			# publikujemy wiadomosc, albo nic dla !on albo ruch liniowy i obrotowy wybrany przez pozycje klikniecia
+			self.publisher_.publish(msg)
 			#rysujemy kolo na srodku
 			cv.circle(img,center,10,(200,200,30),-1)
 			#print(click)
