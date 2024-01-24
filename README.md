@@ -27,8 +27,8 @@ Kontrola położenia żółwia odbywa się przez oddziaływanie myszką na joyst
 * kliknięcie w punkt znajdujący się pod kątem względem pionowej linii prostej przekłada się na kąt obrotu żółwia
 
 ## Autorzy
-Filip Tański
-Michał Szczupakowski
+Filip Tański\
+Michał Szczupakowski\
 Artur Markuszewski
 
 ## License
