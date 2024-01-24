@@ -52,18 +52,38 @@ class TurtleController(Node):
 			#self.publisher_.publish(msg)
 			#zaczynamy rysowac, blank + front
 			img = np.zeros((400,400,3), np.uint8)
-			cv.line(img,(center[0],0),center,(200,10,0),4)
+			#dodajemy obszary do samego ruchu +-x
+			cv.rectangle(img,(0,0),(400,200),(0,0,80),-1)
+			cv.rectangle(img,(0,200),(400,400),(80,0,0),-1)
+			#opisy jakies chociaz
+			cv.putText(img,'X+',(20,40),cv.FONT_HERSHEY_SIMPLEX,1,(150,150,150),2,cv.LINE_AA)
+			cv.putText(img,'X-',(20,380),cv.FONT_HERSHEY_SIMPLEX,1,(150,150,150),2,cv.LINE_AA)
+			#cale pole do ruchu
+			cv.circle(img,center,150,(80,80,80),-1)
+			#ramka <3
+			cv.circle(img,center,150,(50,50,50),3)
+			#obszar wewnetrzny do samego obrotu +-z
+			cv.circle(img,center,50,(50,50,50),-1)
+			cv.line(img,(center[0],50),center,(200,10,0),4)
 			if on:
-				#jak klikamy to rysujemy kreche od srodka do klika i koleczko, ez
-				cv.line(img,center,click,(10,180,20),3)
-				cv.circle(img,click,10,(0,20,200),2)
 				# wyznaczanie kata do obrotu zolwia
-				angle = math.atan2(click[0] - center[0], -click[1] + center[1])/np.pi
 				dist = math.dist(center, click)
-				# predkosc obrotu miesci sie w przedziale -5 <> 5
-				msg.angular.z = -angle * 5.0
-				msg.linear.x = dist / 200 * 5.0
-				#print(click)
+				angle = math.atan2(click[0] - center[0], -click[1] + center[1])/np.pi
+				#jesli miescimy sie w ramce...
+				if dist <150:
+					#jak klikamy to rysujemy kreche od srodka do klika i koleczko, ez
+					cv.line(img,center,click,(10,180,20+200*(dist<50)),3)
+					msg.angular.z = -angle * 5.0
+					#... i nie jestesmy w ciemnym polu
+					if dist >50:
+						msg.linear.x = (dist-50) / 100 * 5.0
+				else:
+					#jesli klikamy poza duzym kolem to robimy sam ruch +-x: czer+ nieb-
+					msg.linear.x=((click[1]<center[1])*2-1)*3.0
+					msg.angular.z=0.0
+				#koleczko rysujemy zawsze przy kliku i tyle w temacie
+				cv.circle(img,click,10,(0,20,200),2)
+				#print(angle)
 			else:
 				msg.linear.x = 0.0
 				msg.linear.y = 0.0
